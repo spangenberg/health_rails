@@ -1,5 +1,5 @@
 require "health_rails/version"
 
 module HealthRails
-  # Your code goes here...
+  autoload :HealthCheck, 'health_rails/health_check'
 end
