@@ -1,4 +1,3 @@
-require 'health_rails'
 require 'rails'
 
 module HealthRails
