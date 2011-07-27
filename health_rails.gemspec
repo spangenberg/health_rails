@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = HealthRails::VERSION
   s.authors     = ["Daniel Spangenberg"]
   s.email       = ["daniel.spangenberg@parcydo.com"]
-  s.homepage    = "http://parcydo.com"
+  s.homepage    = "http://github.com/parcydo/health_rails"
   s.summary     = %q{Health rails provides your rails app a simple password protected health status page for other web services.}
   s.description = %q{Health rails gives you some default checks and a DSL for defining your own checks.}
 
