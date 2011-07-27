@@ -3,6 +3,10 @@ require 'health_rails/health_check'
 require 'health_rails/rails'
 
 module HealthRails
+  # Users which have access to the health check url.
+  mattr_accessor :authentication
+  @@authentication = false
+
   # Health checks which will be processed.
   mattr_accessor :health_checks
   @@health_checks = []

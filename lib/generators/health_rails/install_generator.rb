@@ -1,3 +1,5 @@
+require 'securerandom'
+
 module HealthRails
   module Generators
     class InstallGenerator < Rails::Generators::Base
