@@ -1,11 +1,16 @@
 module HealthRails
   class HealthCheck
-    class HealthCheckFailure < Exception
-    end
-
     def all_ok?
       process_checks
       !errors.any?
+    end
+
+    def check(description)
+      checks[description]
+    end
+
+    def checks
+      HealthCheck.checks
     end
 
     def error_messages
@@ -18,26 +23,26 @@ module HealthRails
 
     def process_check(description)
       begin
-        HealthCheck.check(description).call
+        check(description).call
       rescue HealthCheckFailure => error_message
         errors << "#{description}: #{error_message}"
       end
     end
 
     def process_checks
-      HealthCheck.checks.each do |description, proc|
+      checks.each do |description, proc|
+        next unless HealthRails.health_checks.include?(description)
         process_check(description)
       end
     end
 
     class << self
 
-      def check(description, &block)
-        if block.nil?
-          checks[description]
-        else
-          checks[description] = block
+      def check(description, auto_activated, &block)
+        if auto_activated && !HealthRails.health_checks.include?(description)
+          HealthRails.health_checks << description
         end
+        checks[description] = block
       end
 
       def checks

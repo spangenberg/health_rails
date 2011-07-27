@@ -6,35 +6,51 @@ module HealthRails
 
     before(:each) do
       HealthRails::HealthCheck.stub(:checks).and_return({})
+      HealthRails.stub(:health_checks).and_return([])
     end
 
     describe "run all checks and return status" do
       it "fails" do
-        HealthRails::HealthCheck.check("Failing") do
-          raise HealthRails::HealthCheck::HealthCheckFailure, "Exception"
+        check "Failing" do
+          raise HealthCheckFailure, "Exception"
         end
-        HealthRails::HealthCheck.check("Passing") do
+        check "Passing" do
           nil
         end
         health_check.all_ok?.should be(false)
       end
 
       it "passes" do
-        HealthRails::HealthCheck.check("Passing 1") do
+        check "Passing 1" do
           nil
         end
-        HealthRails::HealthCheck.check("Passing 2") do
+        check "Passing 2" do
           nil
         end
         health_check.all_ok?.should be(true)
       end
     end
 
-    it "push check in checks hash" do
-      block = lambda {}
-      HealthRails::HealthCheck.check("Foo Bar", &block)
-      HealthRails::HealthCheck.checks.size.should be(1)
-      HealthRails::HealthCheck.check("Foo Bar").should be(block)
+    describe "check" do
+      it "push check in checks hash" do
+        block = lambda {}
+        check("Foo Bar", &block)
+        health_check.checks.size.should be(1)
+        health_check.check("Foo Bar").should be(block)
+      end
+
+      it "push check in health_checks config if auto activated" do
+        check "Foo" do
+          nil
+        end
+        check "Bar", false do
+          nil
+        end
+        check "Baz" do
+          nil
+        end
+        HealthRails.health_checks.should eql(["Foo", "Baz"])
+      end
     end
 
     it "join error messages" do
@@ -44,8 +60,8 @@ module HealthRails
 
     describe "process check" do
       it "pushes error on exception" do
-        HealthRails::HealthCheck.check("Foo Bar") do
-          raise HealthRails::HealthCheck::HealthCheckFailure, "Exception"
+      check "Foo Bar" do
+          raise HealthCheckFailure, "Exception"
         end
         health_check.process_check("Foo Bar")
         health_check.errors.size.should be(1)
@@ -54,20 +70,35 @@ module HealthRails
     end
 
     describe "process checks" do
-      it "run process check on each" do
-        HealthRails::HealthCheck.check("Foo") do
-          raise HealthRails::HealthCheck::HealthCheckFailure, "Exception"
+      it "run process check on each check" do
+        check "Foo" do
+          raise HealthCheckFailure, "Exception"
         end
-        HealthRails::HealthCheck.check("Bar") do
-          raise HealthRails::HealthCheck::HealthCheckFailure, "Exception"
+        check "Bar" do
+          raise HealthCheckFailure, "Exception"
         end
-        HealthRails::HealthCheck.check("Baz") do
+        check "Baz" do
           nil
         end
         health_check.process_checks
         health_check.errors.size.should be(2)
         health_check.errors.first.should eql("Foo: Exception")
         health_check.errors.last.should eql("Bar: Exception")
+      end
+
+      it "run only checks which are in the health_checks config" do
+        check "Foo", false do
+          raise HealthCheckFailure, "Exception"
+        end
+        check "Bar" do
+          raise HealthCheckFailure, "Exception"
+        end
+        check "Baz" do
+          nil
+        end
+        health_check.process_checks
+        health_check.errors.size.should be(1)
+        health_check.errors.last.should eql("Bar: Exception")        
       end
     end
 

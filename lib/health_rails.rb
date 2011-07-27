@@ -1,7 +1,8 @@
+require 'health_rails/dsl'
+require 'health_rails/health_check'
 require 'health_rails/rails'
 
 module HealthRails
-  autoload :HealthCheck, 'health_rails/health_check'
   # Health checks which will be processed.
   mattr_accessor :health_checks
   @@health_checks = []
