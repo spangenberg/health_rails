@@ -7,9 +7,12 @@ Gem::Specification.new do |s|
   s.version     = HealthRails::VERSION
   s.authors     = ["Daniel Spangenberg"]
   s.email       = ["daniel.spangenberg@parcydo.com"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.homepage    = "http://parcydo.com"
+  s.summary     = %q{Health rails provides your rails app a simple password protected health status page for other web services.}
+  s.description = %q{Health rails gives you some default checks and a DSL for defining your own checks.}
+
+  s.add_development_dependency "rails"
+  s.add_development_dependency "rspec"
 
   s.rubyforge_project = "health_rails"
 
